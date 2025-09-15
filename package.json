@@ -1,17 +1,37 @@
 {
   "name": "smart-debug",
-  "version": "1.0.0",
+  "version": "0.1.0",
+  "description": "Enhanced console logging with automatic variable names, file locations, and timestamps",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
   "type": "module",
-  "main": "index.js",
+  "files": [
+    "dist/src/"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "test": "node dist/test.js",
+    "prepublishOnly": "npm run build"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "keywords": [
+    "debug",
+    "console",
+    "logging",
+    "developer-tools",
+    "productivity",
+    "typescript"
+  ],
+  "author": "donqlee",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/donqlee/smart-debug.git"
+  },
   "devDependencies": {
-    "@types/node": "^24.3.1",
-    "typescript": "^5.9.2"
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0"
+  },
+  "engines": {
+    "node": ">=16"
   }
 }
