@@ -7,7 +7,7 @@ const isActive = true;
 console.log("=== 기존 방식 ===");
 console.log(userName, age, isActive);
 
-console.log("=== 우리 방식 ===");
+console.log("=== smartLog 방식 ===");
 smartLog(userName, age, isActive);
 smartLog("Hello", "World");
 smartLog({ name: "테스트", value: 123 });
