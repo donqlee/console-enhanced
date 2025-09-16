@@ -1,4 +1,4 @@
-# smart-debug
+# console-enhanced
 
 Enhanced console logging with automatic variable names, file locations, and timestamps.
 
@@ -13,7 +13,7 @@ Enhanced console logging with automatic variable names, file locations, and time
 ## Installation
 
 ```bash
-npm install smart-debug
+npm install console-enhanced
 ```
 
 ## Usage
@@ -21,7 +21,7 @@ npm install smart-debug
 ### Node.js (Full Features)
 
 ```javascript
-import { smartLog } from "smart-debug";
+import { smartLog } from "console-enhanced";
 
 const userName = "홍길동";
 const age = 25;
@@ -31,7 +31,7 @@ const isActive = true;
 console.log(userName, age, isActive);
 // Output: 홍길동 25 true
 
-// Enhanced with smart-debug
+// Enhanced with console-enhanced
 smartLog(userName, age, isActive);
 // Output: 📝 app.js:8 | userName: "홍길동", age: 25, isActive: true | 🕐 오후 2:30:45
 ```
@@ -39,7 +39,7 @@ smartLog(userName, age, isActive);
 ### Browser (Timestamp Only)
 
 ```javascript
-import { smartLog } from "smart-debug";
+import { smartLog } from "console-enhanced";
 
 smartLog("Hello", "World");
 // Output: 🕐 오후 2:30:45 Hello World
@@ -59,7 +59,7 @@ smartLog("Processing", { status: "complete" });
 // Output: 📝 app.js:15 | Processing {"status":"complete"} | 🕐 오후 2:30:45
 ```
 
-## Why smart-debug?
+## Why console-enhanced?
 
 Stop guessing what your console.log outputs mean:
 

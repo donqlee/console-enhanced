@@ -1,5 +1,5 @@
 {
-  "name": "smart-debug",
+  "name": "console-enhanced",
   "version": "0.1.0",
   "description": "Enhanced console logging with automatic variable names, file locations, and timestamps",
   "main": "dist/src/index.js",
