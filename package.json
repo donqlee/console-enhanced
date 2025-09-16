@@ -25,7 +25,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/donqlee/smart-debug.git"
+    "url": "https://github.com/donqlee/console-enhanced.git"
   },
   "devDependencies": {
     "typescript": "^5.0.0",
