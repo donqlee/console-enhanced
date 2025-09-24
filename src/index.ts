@@ -10,6 +10,9 @@ interface VariableInfo {
   values: any[];
 }
 
+// 타이머 관리용 맵
+const timers = new Map<string, number>();
+
 function isBrowser(): boolean {
   return typeof window !== "undefined";
 }
@@ -33,7 +36,7 @@ function getCallerInfo(): FileInfo | null {
     if (fileMatch) {
       const [, fullPath, lineNumber] = fileMatch;
       return {
-        fileName: `/${fullPath}`, // 앞에 / 추가!
+        fileName: `/${fullPath}`,
         lineNumber: parseInt(lineNumber, 10),
       };
     }
@@ -56,7 +59,11 @@ function getCallerInfo(): FileInfo | null {
   }
 }
 
-function extractVariableNames(filePath: string, lineNumber: number): string[] {
+function extractVariableNames(
+  filePath: string,
+  lineNumber: number,
+  functionName: string = "smartLog"
+): string[] {
   try {
     if (isBrowser()) {
       return [];
@@ -68,7 +75,8 @@ function extractVariableNames(filePath: string, lineNumber: number): string[] {
 
     if (!targetLine) return [];
 
-    const match = targetLine.match(/smartLog\s*\(\s*([^)]+)\s*\)/);
+    const regex = new RegExp(`${functionName}\\s*\\(\\s*([^)]+)\\s*\\)`);
+    const match = targetLine.match(regex);
     if (!match) return [];
 
     const argsString = match[1];
@@ -115,6 +123,19 @@ function formatWithVariableNames(
     })
     .join(", ");
 }
+
+function formatTime(ms: number): string {
+  if (ms < 1000) {
+    return `${ms.toFixed(2)}ms`;
+  } else if (ms < 60000) {
+    return `${(ms / 1000).toFixed(2)}s`;
+  } else {
+    const minutes = Math.floor(ms / 60000);
+    const seconds = ((ms % 60000) / 1000).toFixed(2);
+    return `${minutes}m ${seconds}s`;
+  }
+}
+
 export function smartLog(...args: any[]): void {
   const now = new Date();
   const timestamp = now.toLocaleTimeString("ko-KR");
@@ -131,7 +152,6 @@ export function smartLog(...args: any[]): void {
       );
       const formattedOutput = formatWithVariableNames(variableNames, args);
 
-      // 표시용으로는 짧은 파일명 사용
       const shortFileName =
         fileInfo.fileName.split("/").pop()?.split("\\").pop() || "unknown";
 
@@ -144,4 +164,125 @@ export function smartLog(...args: any[]): void {
   }
 }
 
-export default { smartLog };
+export function time(...args: any[]): void {
+  const now = new Date();
+  const timestamp = now.toLocaleTimeString("ko-KR");
+
+  if (isBrowser()) {
+    // 브라우저에서는 간단하게
+    if (args.length > 0) {
+      const label = String(args[0]);
+      console.time(label);
+      console.log(`🕐 ${timestamp} ⏱️ Timer started: ${label}`);
+    }
+  } else {
+    const fileInfo = getCallerInfo();
+
+    if (fileInfo) {
+      // 변수명 추출
+      const variableNames = extractVariableNames(
+        fileInfo.fileName,
+        fileInfo.lineNumber,
+        "time"
+      );
+
+      // 타이머 레이블 결정
+      let label: string;
+      if (variableNames.length > 0 && variableNames[0]) {
+        label = variableNames[0];
+      } else if (args.length > 0) {
+        label = String(args[0]);
+      } else {
+        label = "default";
+      }
+
+      // 타이머 시작
+      timers.set(label, performance.now());
+
+      const shortFileName =
+        fileInfo.fileName.split("/").pop()?.split("\\").pop() || "unknown";
+
+      console.log(
+        `📝 ${shortFileName}:${fileInfo.lineNumber} | ⏱️ Timer started: ${label} | 🕐 ${timestamp}`
+      );
+    } else {
+      const label = args.length > 0 ? String(args[0]) : "default";
+      timers.set(label, performance.now());
+      console.log(`🕐 ${timestamp} ⏱️ Timer started: ${label}`);
+    }
+  }
+}
+
+export function timeEnd(...args: any[]): void {
+  const now = new Date();
+  const timestamp = now.toLocaleTimeString("ko-KR");
+
+  if (isBrowser()) {
+    // 브라우저에서는 간단하게
+    if (args.length > 0) {
+      const label = String(args[0]);
+      console.timeEnd(label);
+      console.log(`🕐 ${timestamp} ⏱️ Timer ended: ${label}`);
+    }
+  } else {
+    const fileInfo = getCallerInfo();
+
+    if (fileInfo) {
+      // 변수명 추출
+      const variableNames = extractVariableNames(
+        fileInfo.fileName,
+        fileInfo.lineNumber,
+        "timeEnd"
+      );
+
+      // 타이머 레이블 결정
+      let label: string;
+      if (variableNames.length > 0 && variableNames[0]) {
+        label = variableNames[0];
+      } else if (args.length > 0) {
+        label = String(args[0]);
+      } else {
+        label = "default";
+      }
+
+      // 타이머 종료 및 시간 계산
+      const startTime = timers.get(label);
+      if (startTime !== undefined) {
+        const elapsed = performance.now() - startTime;
+        timers.delete(label);
+
+        const shortFileName =
+          fileInfo.fileName.split("/").pop()?.split("\\").pop() || "unknown";
+
+        console.log(
+          `📝 ${shortFileName}:${
+            fileInfo.lineNumber
+          } | ⏱️ ${label}: ${formatTime(elapsed)} | 🕐 ${timestamp}`
+        );
+      } else {
+        const shortFileName =
+          fileInfo.fileName.split("/").pop()?.split("\\").pop() || "unknown";
+
+        console.log(
+          `📝 ${shortFileName}:${fileInfo.lineNumber} | ⚠️ Timer '${label}' was not started | 🕐 ${timestamp}`
+        );
+      }
+    } else {
+      const label = args.length > 0 ? String(args[0]) : "default";
+      const startTime = timers.get(label);
+      if (startTime !== undefined) {
+        const elapsed = performance.now() - startTime;
+        timers.delete(label);
+        console.log(`🕐 ${timestamp} ⏱️ ${label}: ${formatTime(elapsed)}`);
+      } else {
+        console.log(`🕐 ${timestamp} ⚠️ Timer '${label}' was not started`);
+      }
+    }
+  }
+}
+
+// smartLog에 time, timeEnd 메서드 추가
+smartLog.time = time;
+smartLog.timeEnd = timeEnd;
+
+export default { smartLog, time, timeEnd };
