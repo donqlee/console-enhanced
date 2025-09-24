@@ -58,7 +58,50 @@ setTimeout(() => {
       // 시뮬레이션: 2초 대기
       setTimeout(() => {
         smartLog.timeEnd(longTask);
-        console.log("\n=== 테스트 완료 ===");
+
+        console.log("\n=== 새로운 measure 기능 테스트 ===\n");
+
+        console.log("8. measure 함수 테스트 (동기):");
+        const syncTask = smartLog.measure(() => {
+          // 동기 작업 시뮬레이션
+          let sum = 0;
+          for (let i = 0; i < 1000000; i++) {
+            sum += i;
+          }
+          return sum;
+        });
+        console.log(`결과: ${syncTask}`);
+
+        console.log("\n9. measure 함수 테스트 (커스텀 라벨):");
+        const customResult = smartLog.measure(() => {
+          return Math.random() * 100;
+        }, "randomGeneration");
+        console.log(`결과: ${customResult}`);
+
+        console.log("\n10. measureAsync 테스트:");
+        // Promise 테스트
+        const asyncTask = smartLog.measureAsync(
+          new Promise((resolve) => {
+            setTimeout(() => resolve("async result"), 300);
+          })
+        );
+
+        asyncTask.then((result: any) => {
+          console.log(`비동기 결과: ${result}`);
+
+          console.log("\n11. measureAsync 실제 API 시뮬레이션:");
+          const fakeApiCall = smartLog.measureAsync(
+            new Promise((resolve) => {
+              setTimeout(() => resolve({ users: [1, 2, 3] }), 150);
+            }),
+            "fetchUsers"
+          );
+
+          fakeApiCall.then((apiResult: any) => {
+            console.log(`API 결과:`, apiResult);
+            console.log("\n=== 모든 테스트 완료 ===");
+          });
+        });
       }, 2000);
     }, 120);
   }, 50);

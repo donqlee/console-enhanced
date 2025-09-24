@@ -281,8 +281,129 @@ export function timeEnd(...args: any[]): void {
   }
 }
 
-// smartLog에 time, timeEnd 메서드 추가
+export function measure<T>(fn: () => T, label?: string): T {
+  const now = new Date();
+  const timestamp = now.toLocaleTimeString("ko-KR");
+
+  if (isBrowser()) {
+    // 브라우저에서는 간단하게
+    const start = performance.now();
+    const result = fn();
+    const elapsed = performance.now() - start;
+    const finalLabel = label || "Function execution";
+    console.log(`🕐 ${timestamp} ⏱️ ${finalLabel}: ${formatTime(elapsed)}`);
+    return result;
+  } else {
+    const fileInfo = getCallerInfo();
+
+    if (fileInfo) {
+      // 변수명 추출 시도
+      const variableNames = extractVariableNames(
+        fileInfo.fileName,
+        fileInfo.lineNumber,
+        "measure"
+      );
+
+      // 레이블 결정
+      let finalLabel: string;
+      if (label) {
+        finalLabel = label;
+      } else if (variableNames.length > 0 && variableNames[0]) {
+        finalLabel = variableNames[0];
+      } else {
+        finalLabel = "Function execution";
+      }
+
+      const start = performance.now();
+      const result = fn();
+      const elapsed = performance.now() - start;
+
+      const shortFileName =
+        fileInfo.fileName.split("/").pop()?.split("\\").pop() || "unknown";
+
+      console.log(
+        `📝 ${shortFileName}:${
+          fileInfo.lineNumber
+        } | ⏱️ ${finalLabel}: ${formatTime(elapsed)} | 🕐 ${timestamp}`
+      );
+
+      return result;
+    } else {
+      const start = performance.now();
+      const result = fn();
+      const elapsed = performance.now() - start;
+      const finalLabel = label || "Function execution";
+      console.log(`🕐 ${timestamp} ⏱️ ${finalLabel}: ${formatTime(elapsed)}`);
+      return result;
+    }
+  }
+}
+
+export async function measureAsync<T>(
+  promise: Promise<T>,
+  label?: string
+): Promise<T> {
+  const now = new Date();
+  const timestamp = now.toLocaleTimeString("ko-KR");
+
+  if (isBrowser()) {
+    // 브라우저에서는 간단하게
+    const start = performance.now();
+    const result = await promise;
+    const elapsed = performance.now() - start;
+    const finalLabel = label || "Promise execution";
+    console.log(`🕐 ${timestamp} ⏱️ ${finalLabel}: ${formatTime(elapsed)}`);
+    return result;
+  } else {
+    const fileInfo = getCallerInfo();
+
+    if (fileInfo) {
+      // 변수명 추출 시도
+      const variableNames = extractVariableNames(
+        fileInfo.fileName,
+        fileInfo.lineNumber,
+        "measureAsync"
+      );
+
+      // 레이블 결정
+      let finalLabel: string;
+      if (label) {
+        finalLabel = label;
+      } else if (variableNames.length > 0 && variableNames[0]) {
+        finalLabel = variableNames[0];
+      } else {
+        finalLabel = "Promise execution";
+      }
+
+      const start = performance.now();
+      const result = await promise;
+      const elapsed = performance.now() - start;
+
+      const shortFileName =
+        fileInfo.fileName.split("/").pop()?.split("\\").pop() || "unknown";
+
+      console.log(
+        `📝 ${shortFileName}:${
+          fileInfo.lineNumber
+        } | ⏱️ ${finalLabel}: ${formatTime(elapsed)} | 🕐 ${timestamp}`
+      );
+
+      return result;
+    } else {
+      const start = performance.now();
+      const result = await promise;
+      const elapsed = performance.now() - start;
+      const finalLabel = label || "Promise execution";
+      console.log(`🕐 ${timestamp} ⏱️ ${finalLabel}: ${formatTime(elapsed)}`);
+      return result;
+    }
+  }
+}
+
+// smartLog에 모든 메서드 추가
 smartLog.time = time;
 smartLog.timeEnd = timeEnd;
+smartLog.measure = measure;
+smartLog.measureAsync = measureAsync;
 
-export default { smartLog, time, timeEnd };
+export default { smartLog, time, timeEnd, measure, measureAsync };
