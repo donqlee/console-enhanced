@@ -1,15 +1,11 @@
 # console-enhanced
 
-Enhanced console logging with automatic variable names, file locations, timestamps, and **performance measurement**.
+[![npm version](https://img.shields.io/npm/v/console-enhanced.svg?style=flat-square)](https://www.npmjs.com/package/console-enhanced)
+[![npm downloads](https://img.shields.io/npm/dw/console-enhanced.svg?style=flat-square)](https://www.npmjs.com/package/console-enhanced)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
 
-## Features
-
-- 📝 **Automatic variable name extraction** (Node.js)
-- 📍 **File name and line number display** (Node.js)
-- 🕐 **Timestamp logging**
-- ⏱️ **Performance measurement suite** - NEW!
-- 🎨 **Smart formatting** for different data types
-- 🌍 **Cross-platform support** (Node.js & Browser)
+> 📝 Drop-in replacement for `console.log` that automatically shows **variable names, file/line, timestamps, and execution time**.  
+> Works in Node.js and the browser, with zero dependencies and built-in TypeScript types.
 
 ## Installation
 
@@ -17,111 +13,72 @@ Enhanced console logging with automatic variable names, file locations, timestam
 npm install console-enhanced
 ```
 
-## Usage
-
-### Basic Logging
+## Quick Start
 
 ```javascript
 import { smartLog } from "console-enhanced";
 
-const userName = "홍길동";
+const user = "Alice";
 const age = 25;
-const isActive = true;
 
-// Basic usage
-console.log(userName, age, isActive);
-// Output: 홍길동 25 true
-
-// Enhanced with console-enhanced
-smartLog(userName, age, isActive);
-// Output: 📝 app.js:8 | userName: "홍길동", age: 25, isActive: true | 🕐 오후 2:30:45
+smartLog(user, age);
+// 📝 app.js:8 | user: "Alice", age: 25 | 🕐 14:30:45
 ```
 
-## Performance Measurement (NEW!)
-
-### Time/TimeEnd Pattern
+### Before
 
 ```javascript
-const apiCall = "fetchUsers";
-smartLog.time(apiCall);
-// ... your code here
-smartLog.timeEnd(apiCall);
-// Output: 📝 app.js:15 | ⏱️ apiCall: 245.23ms | 🕐 오후 2:30:45
+console.log(user, age);
+// Alice 25
 ```
 
-### Function Measurement
+### After
 
 ```javascript
-const result = smartLog.measure(() => {
-  // Heavy computation
-  return processLargeData();
-});
-// Output: 📝 app.js:18 | ⏱️ Function execution: 1.25s | 🕐 오후 2:30:45
-// Returns: original function result
+smartLog(user, age);
+// 📝 app.js:8 | user: "Alice", age: 25 | 🕐 14:30:45
 ```
 
-### Promise/Async Measurement
+## Features
+
+- 📝 **Automatic variable name extraction** (Node.js only)
+- 📍 **File name and line number display** (Node.js only)
+- 🕐 **Timestamps** for every log
+- ⏱️ **Performance measurement** (time, timeEnd, measure, measureAsync)
+- 🎨 **Smart formatting** for different data types
+- 🌍 **Cross-platform** (Node.js & Browser)
+
+## Performance Measurement
 
 ```javascript
-const data = await smartLog.measureAsync(fetch("/api/users"));
-// Output: 📝 app.js:21 | ⏱️ Promise execution: 342.67ms | 🕐 오후 2:30:45
-// Returns: original promise result
+import { smartLog } from "console-enhanced";
+
+// time / timeEnd
+smartLog.time("fetchUsers");
+await fetch("/api/users");
+smartLog.timeEnd("fetchUsers");
+// 📝 app.js:15 | ⏱️ fetchUsers: 245.23ms | 🕐 14:30:45
+
+// measure (sync)
+const result = smartLog.measure(() => heavyComputation());
+// 📝 app.js:18 | ⏱️ Function execution: 1.25s | 🕐 14:30:45
+
+// measureAsync (promise/async)
+const users = await smartLog.measureAsync(fetch("/api/users"), "fetchUsers");
+// 📝 app.js:21 | ⏱️ fetchUsers: 342.67ms | 🕐 14:30:45
 ```
 
-### Browser (Basic Features)
+## Browser Usage
 
 ```javascript
 import { smartLog } from "console-enhanced";
 
 smartLog("Hello", "World");
-// Output: 🕐 오후 2:30:45 Hello World
+// 🕐 14:30:45 Hello World
 
-smartLog.measure(() => computation());
-// Output: 🕐 오후 2:30:45 ⏱️ Function execution: 15.67ms
+smartLog.measure(() => doSomething());
+// 🕐 14:30:45 ⏱️ Function execution: 15.67ms
 ```
-
-## Performance Examples
-
-```javascript
-// API performance tracking
-const userAPI = "getUserData";
-smartLog.time(userAPI);
-const response = await fetch("/api/user/123");
-smartLog.timeEnd(userAPI);
-
-// Database query timing
-const dbQuery = "findUserById";
-smartLog.time(dbQuery);
-const user = await db.users.findById(123);
-smartLog.timeEnd(dbQuery);
-// Output: 📝 app.js:12 | ⏱️ dbQuery: 89.32ms | 🕐 오후 2:30:45
-
-// Algorithm comparison
-const bubbleResult = smartLog.measure(() => bubbleSort(data));
-const quickResult = smartLog.measure(() => quickSort(data));
-```
-
-## Why console-enhanced?
-
-Stop guessing what your console.log outputs mean:
-
-**Before:**
-
-```
-홍길동 25 true
-245.23
-{ users: [1, 2, 3] }
-```
-
-**After:**
-
-```
-📝 app.js:8 | userName: "홍길동", age: 25, isActive: true | 🕐 오후 2:30:45
-📝 app.js:15 | ⏱️ apiCall: 245.23ms | 🕐 오후 2:30:45
-📝 app.js:18 | ⏱️ fetchUsers: 1.25s | 🕐 오후 2:30:45
-```
-
-## Platform Support
 
 | Feature            | Node.js | Browser |
 | ------------------ | ------- | ------- |
@@ -130,7 +87,50 @@ Stop guessing what your console.log outputs mean:
 | Variable names     | ✅      | ❌\*    |
 | Performance timing | ✅      | ✅      |
 
-\*Browser limitations due to security restrictions. File info is provided by browser dev tools.
+\*Browser limitations: variable names and callsite are not available due to security restrictions. Browser DevTools provide file/line info instead.
+
+## API Reference
+
+### `smartLog(...args: any[])`
+
+Logs variables with names, values, file/line and timestamp (Node).  
+Falls back to console-style logging in the browser.
+
+---
+
+### `smartLog.time(label?: string)`
+
+Starts a performance timer.  
+`label` is optional.
+
+---
+
+### `smartLog.timeEnd(label?: string)`
+
+Ends a timer and logs elapsed time.
+
+---
+
+### `smartLog.measure(fn: () => T, label?: string): T`
+
+Measures synchronous function execution time and logs result.  
+Returns the original function result.
+
+---
+
+### `smartLog.measureAsync(promise: Promise<T>, label?: string): Promise<T>`
+
+Measures asynchronous function or promise execution time.  
+Returns the resolved value.
+
+---
+
+## Why console-enhanced?
+
+- **Zero dependencies** → minimal install size
+- **ESM + TypeScript support** → modern projects ready
+- **Readable logs** → stop guessing what `console.log` output means
+- **Built-in performance profiling** → time your code with zero setup
 
 ## License
 

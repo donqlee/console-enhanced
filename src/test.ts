@@ -1,4 +1,4 @@
-import { smartLog } from "./src/index.js";
+import { smartLog } from "./index.js";
 
 console.log("=== console-enhanced 테스트 시작 ===\n");
 

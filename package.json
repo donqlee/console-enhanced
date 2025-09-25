@@ -1,14 +1,26 @@
 {
   "name": "console-enhanced",
-  "version": "0.2.0",
-  "description": "Enhanced console logging with automatic variable names, file locations, and timestamps",
-  "main": "dist/src/index.js",
-  "types": "dist/src/index.d.ts",
+  "version": "0.2.1",
+  "description": "Enhanced console logging with automatic variable names, file locations, timestamps, and performance measurement",
   "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "sideEffects": false,
   "files": [
-    "dist/src/"
+    "dist/index.js",
+    "dist/index.d.ts",
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
+    "clean": "rm -rf dist",
     "build": "tsc",
     "test": "node dist/test.js",
     "prepublishOnly": "npm run build"
@@ -17,8 +29,12 @@
     "debug",
     "console",
     "logging",
-    "developer-tools",
-    "productivity",
+    "logger",
+    "timestamp",
+    "callsite",
+    "line-number",
+    "performance",
+    "measure",
     "typescript"
   ],
   "author": "donqlee",
@@ -32,6 +48,6 @@
     "@types/node": "^20.0.0"
   },
   "engines": {
-    "node": ">=16"
+    "node": ">=18"
   }
 }
